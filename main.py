@@ -264,61 +264,72 @@ class AudioLiaison:
         
         self.ptimer = 0.0
 
-        
+        self.active = False
+        self.activatePress = True
     def Update(self,dt=0.0):
-        i = 0
-        prs = False
-        self.alphanum = [key.A,key.B, key.C, key.D, key.E, key.F, key.G, key.H, key.I, key.J, key.K, key.L, key.M, key.N, key.O, key.P, key.Q, key.R, key.S, key.T, key.U, key.V, key.W, key.X, key.Y, key.Z, key._0, key._1, key._2, key._3, key._4, key._5, key._6, key._7, key._8, key._9, 
-                        key.SPACE]
-        self.alphanum = [keys[a] for a in self.alphanum]
+        if keys[key.GRAVE] and self.activatePress == False:
+            self.active = not self.active
+            self.activatePress = True
 
-        if keys[key.ENTER] and not self.pressed2:
-            self.PushMessage(self.memstr)
-            self.memstr = ""
-            self.pressed2 = True
-            
-        elif keys[key.BACKSPACE] and not self.pressed3:
-            self.memstr = self.memstr[0:len(self.memstr)-1]
-            self.pressed3 = True
-            self.ptimer = 0.15
-        else:
-            if self.alphanum.count(True) != 0:
-                K = self.alphanum.index(True)
-                if self.prev[K] == False:
-                    self.memstr += "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "[K]
-            
-        
-        if not (keys[key.ENTER]):
-            self.pressed2 = False
-        if not (keys[key.BACKSPACE]) or self.ptimer <= 0.0:
-            self.pressed3 = False
-        
-        if self.ptimer >= 0.0:
-            self.ptimer -= dt
+        if not keys[key.GRAVE]:
+            self.activatePress = False        
         
 
-        self.prev = self.alphanum
+        if self.active:
+            i = 0
+            prs = False
+            self.alphanum = [key.A,key.B, key.C, key.D, key.E, key.F, key.G, key.H, key.I, key.J, key.K, key.L, key.M, key.N, key.O, key.P, key.Q, key.R, key.S, key.T, key.U, key.V, key.W, key.X, key.Y, key.Z, key._0, key._1, key._2, key._3, key._4, key._5, key._6, key._7, key._8, key._9, 
+                            key.SPACE, key.PERIOD]
+            self.alphanum = [keys[a] for a in self.alphanum]
+
+            if keys[key.ENTER] and not self.pressed2:
+                self.PushMessage(self.memstr)
+                self.memstr = ""
+                self.pressed2 = True
+                
+            elif keys[key.BACKSPACE] and not self.pressed3:
+                self.memstr = self.memstr[0:len(self.memstr)-1]
+                self.pressed3 = True
+                self.ptimer = 0.15
+            else:
+                if self.alphanum.count(True) != 0:
+                    K = self.alphanum.index(True)
+                    if self.prev[K] == False:
+                        self.memstr += "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ."[K]
+                
+            
+            if not (keys[key.ENTER]):
+                self.pressed2 = False
+            if not (keys[key.BACKSPACE]) or self.ptimer <= 0.0:
+                self.pressed3 = False
+            
+            if self.ptimer >= 0.0:
+                self.ptimer -= dt
+            
+
+            self.prev = self.alphanum
 
     def Render(self,camera=None):
-        FNT[FNT.index(">")+1].blit(16, 16, width=28,height=28)
-        i = 0
-        if self.memstr != "":
-            
-           
-            for c in self.memstr:
-                if c != " ":
-                    FNT[FNT.index(c)+1].blit(16+(i+1)*32, 16, width=28,height=28)
-                i+=1
-        
-        FNT[FNT.index("|")+1].blit(16+(i+1)*32, 16, width=28,height=28)
-        j = 0
-        for s in self.outstrs:
+        if self.active:
+            FNT[FNT.index(">")+1].blit(16, 16, width=28,height=28)
             i = 0
-            for c in s:
-                if c != " ":
-                    FNT[FNT.index(c)+1].blit(16+(i+1)*32, 32*6 - (j * 32), width=28,height=28)
-                i+=1
-            j+=1
+            if self.memstr != "":
+                
+            
+                for c in self.memstr:
+                    if c != " ":
+                        FNT[FNT.index(c)+1].blit(16+(i+1)*32, 16, width=28,height=28)
+                    i+=1
+            
+            FNT[FNT.index("|")+1].blit(16+(i+1)*32, 16, width=28,height=28)
+            j = 0
+            for s in self.outstrs:
+                i = 0
+                for c in s:
+                    if c != " ":
+                        FNT[FNT.index(c)+1].blit(16+(i+1)*32, 32*6 - (j * 32), width=28,height=28)
+                    i+=1
+                j+=1
 
     def PushMessage(self, msg):
         out = self.sysPtr.HandleMessage(msg)
@@ -391,7 +402,7 @@ FPS = []
 t = time.time()
 
 
-
+audioMgr.PushMessage("LOADPIANO")
 while True:
     
     
