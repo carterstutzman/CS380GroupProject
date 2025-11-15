@@ -6,6 +6,8 @@ from pyglet.gl import *
 
 from pyglet.graphics import *
 
+from audio import *
+
 pyglet.image.Texture.default_mag_filter = pyglet.image.Texture.default_min_filter = pyglet.gl.GL_NEAREST
 
 pyglet.gl.glEnable(pyglet.gl.GL_TEXTURE_2D)
@@ -20,7 +22,7 @@ window = pyglet.window.Window(screenSize[0], screenSize[1])
 keys = key.KeyStateHandler()
 window.push_handlers(keys)
 ##glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST) 
-glClearColor(0.6,0.6,0.6,1)
+glClearColor(0.0,0.0,0.0,1)
 
 PAL = [[255,255,255,255],
        [192,192,192,255],
@@ -85,6 +87,7 @@ def CloseEnough2D(a,b,d):
     A = abs(a[0]-b[0]) <= d
     B = abs(a[1]-b[1]) <= d
     return A and B
+
 class Camera:
     def __init__(self):
         self.scl = 4.0
@@ -99,6 +102,10 @@ class Camera:
     def SetTarget(self, tgt):
         self.tgt = tgt
     def Update(self, dt):
+        if keys[key.Z]:
+            self.scl = 10.0
+        else:
+            self.scl = 1.0
         pass
     def Render(self,camera=None):
         pass
@@ -107,8 +114,14 @@ class Scene:
     def __init__(self, stuff=[]):
         self.stuff = stuff
         
-        
-        
+    def MouseMotion(self, x,y,dx,dy):
+        pass
+    def PushMessage(self, msg):
+        for thing in self.stuff:
+            try:
+                thing.HandleMessage(msg)
+            except:
+                pass
     def GetAll(self, t):
         temp = []
         for thing in self.stuff:
@@ -148,6 +161,70 @@ class Scene:
             thing.Render(camera)      
 
 
+
+FNT = [ "A", MAKE([".11111.", ".11..1.", ".11..1.", "1111111", "11....1", "11....1", "11....1", ]), 
+       "B", MAKE(["11111..", "11..1..", "11..1..", "1111111", "11....1", "11....1", "1111111", ]), 
+       "C", MAKE(["1111111", "11.....", "11.....", "111....", "111....", "111....", "1111111", ]), 
+       "D", MAKE(["111111.", "11...11", "11....1", "111...1", "111...1", "111..11", "111111.", ]), 
+       "E", MAKE(["1111111", "11.....", "11.....", "11111..", "111....", "111....", "1111111", ]), 
+       "F", MAKE(["1111111", "11.....", "11.....", "11111..", "111....", "111....", "111....", ]), 
+       "G", MAKE(["1111111", "11....1", "11.....", "11.....", "11..111", "11...11", "1111111", ]), 
+       "H", MAKE(["11....1", "11....1", "11....1", "1111111", "111...1", "111...1", "111...1", ]), 
+       "I", MAKE(["1111111", "..11...", "..11...", "..111..", "..111..", "..111..", "1111111", ]), 
+       "J", MAKE([".....11", ".....11", ".....11", ".....11", "1....11", "1....11", "1111111", ]), 
+       "K", MAKE(["11...1.", "11...1.", "11...1.", "1111111", "111...1", "111...1", "111...1", ]), 
+       "L", MAKE(["11.....", "11.....", "11.....", "111....", "111....", "111....", "1111111", ]), 
+       "M", MAKE(["1111111", "11.11.1", "11.11.1", "11....1", "111...1", "111...1", "111...1", ]), 
+       "N", MAKE(["1111111", "11....1", "11....1", "111...1", "111...1", "111...1", "111...1", ]), 
+       "O", MAKE(["1111111", "11....1", "11....1", "11....1", "11....1", "11....1", "1111111", ]), 
+       "P", MAKE(["1111111", "11....1", "11....1", "1111111", "111....", "111....", "111....", ]), 
+       "Q", MAKE(["111111.", "11...1.", "11...1.", "111..1.", "111..1.", "111..1.", "1111111", ]), 
+       "R", MAKE(["1111111", "11....1", "11....1", "1111111", "111..1.", "111..1.", "111..1.", ]), 
+       "S", MAKE(["1111111", "11.....", "11.....", "1111111", "....111", "....111", "1111111", ]), 
+       "T", MAKE(["1111111", "..11...", "..11...", "..11...", "..111..", "..111..", "..111..", ]), 
+       "U", MAKE(["11....1", "11....1", "11....1", "111...1", "111...1", "111...1", "1111111", ]), 
+       "V", MAKE(["11....1", "11....1", "11....1", "11...11", ".11..1.", ".11..1.", ".11111.", ]), 
+       "W", MAKE(["11....1", "11....1", "11....1", "111...1", "111.1.1", "111.1.1", "1111111", ]), 
+       "X", MAKE(["11....1", "11....1", "11...11", ".11111.", "1111111", "111...1", "111...1", ]), 
+       "Y", MAKE(["11....1", "11....1", "11....1", "1111111", "...11..", "...11..", "...11.", ]), 
+       "Z", MAKE(["1111111", "....111", "...111.", ".1111..", "1111...", "111....", "1111111", ]), 
+       ".", MAKE([".......", ".......", ".......", ".......", ".......", "11.....", "11.....", ]), 
+       "!", MAKE(["11.....", "11.....", "11.....", "11.....", ".......", "11.....", "11.....", ]), 
+       "?", MAKE(["1111111", ".....11", ".....11", "1111111", "11.....", ".......", "11.....", ]), 
+       "#", MAKE([".......", ".......", ".1.1...", "11111..", ".1.1...", "11111..", ".1.1...", ]), 
+       "b", MAKE(["1......", "1......", "1.11...", "11..1..", "1...1..", "1...1..", "1111...", ]), 
+       "~", MAKE([".......", ".......", ".11....", "1..1..1", "....11.", ".......", ".......", ]), 
+       "@", MAKE(["1111111", "1.....1", "1.111.1", "1.1.1.1", "1.11111", "1......", "1111111", ]), 
+       ">", MAKE([".1.....", ".11....", ".111...", ".1111..", ".111...", ".11....", ".1.....", ]), 
+       "<", MAKE(["....1..", "...11..", "..111..", ".1111..", "..111..", "...11..", "....1..", ]), 
+       "$",##MUSICNOTE 
+       MAKE([".......", "..1111.", "..1111.", "..1..1.", ".11.11.", ".11.11.", ".......", ]), 
+       "%",##SPEAKER (VOLUME) 
+       MAKE([".....11", "...1111", "1111111", "1111111", "1111111", "...1111", ".....11", ]), 
+       "}", MAKE(["1.1.1.1", "1.1.1.1", "1.1.1.1", "1.1.1.1", "1.1.1.1", "1.1.1.1", "1.1.1.1", ]), 
+       "{", MAKE(["1.1.1..", "1.1.1..", "1.1.1..", "1.1.1..", "1.1.1..", "1.1.1..", "1.1.1..", ]), 
+       "]", MAKE(["1.1....", "1.1....", "1.1....", "1.1....", "1.1....", "1.1....", "1.1....", ]), 
+       "[", MAKE(["1......", "1......", "1......", "1......", "1......", "1......", "1......", ]), 
+       "0", MAKE(["1111111", "11...11", "11..111", "11.11.1", "1111..1", "111...1", "1111111", ]), 
+       "1", MAKE(["11111..", "..111..", "..111..", "..111..", "..111..", "..111..", "1111111", ]), 
+       "2", MAKE(["1111111", ".....11", ".....11", "1111111", "11.....", "11.....", "1111111", ]), 
+       "3", MAKE(["1111111", ".....11", ".....11", "..11111", ".....11", ".....11", "1111111", ]), 
+       "4", MAKE(["1....11", "1....11", "1....11", "1111111", ".....11", ".....11", ".....11", ]), 
+       "5", MAKE(["1111111", "11.....", "11.....", "1111111", ".....11", ".....11", "1111111", ]), 
+       "6", MAKE(["1111111", "11.....", "11.....", "1111111", "11....1", "11....1", "1111111", ]), 
+       "7", MAKE(["1111111", ".....11", ".....11", ".....11", ".....11", ".....11", ".....11", ]), 
+       "8", MAKE(["1111111", "11....1", "11....1", "1111111", "11....1", "11....1", "1111111", ]), 
+       "9", MAKE(["1111111", "1....11", "1....11", "1111111", ".....11", ".....11", ".....11", ]), 
+       "+", MAKE([".......", "...1...", "...1...", ".11111.", "...1...", "...1...", ".......", ]), 
+       "-", MAKE([".......", ".......", ".......", ".11111.", ".......", ".......", ".......", ]), 
+       "|", MAKE(["...1...", "...1...", "...1...", "...1...", "...1...", "...1...", "...1...", ]), 
+       "_", MAKE([".......", ".......", ".......", ".......", ".......", ".......", "1111111", ]), 
+       "", MAKE(["1111111", "1111111", "111.111", "11...11", "1.....1", "1111111", "1111111", ]), 
+       "", MAKE(["1111111", "1111111", "1.....1", "11...11", "111.111", "1111111", "1111111", ]), 
+       "", MAKE(["1111111", "1111.11", "111..11", "11...11", "111..11", "1111.11", "1111111", ]), 
+       "", MAKE(["1111111", "11.1111", "11..111", "11...11", "11..111", "11.1111", "1111111", ]), 
+       ]
+
 PLAYER = [
     MAKE([".000000.",
           "0000000.",
@@ -170,29 +247,117 @@ PLAYER = [
     
 ]
 
+class AudioLiaison:
+    def __init__(self, sysPtr):
+        self.sysPtr = sysPtr
+
+        self.memstr = ""
+        self.outstrs = []
+
+        self.alphanum = [key.A,key.B, key.C, key.D, key.E, key.F, key.G, key.H, key.I, key.J, key.K, key.L, key.M, key.N, key.O, key.P, key.Q, key.R, key.S, key.T, key.U, key.V, key.W, key.X, key.Y, key.Z, key._0, key._1, key._2, key._3, key._4, key._5, key._6, key._7, key._8, key._9, 
+                        key.SPACE]
+        self.prev = [0 for n in range(0,100)]
+        self.prev2 = []
+        self.pressed = False
+        self.pressed2 = False
+        self.pressed3 = False
+        
+        self.ptimer = 0.0
+
+        
+    def Update(self,dt=0.0):
+        i = 0
+        prs = False
+        self.alphanum = [key.A,key.B, key.C, key.D, key.E, key.F, key.G, key.H, key.I, key.J, key.K, key.L, key.M, key.N, key.O, key.P, key.Q, key.R, key.S, key.T, key.U, key.V, key.W, key.X, key.Y, key.Z, key._0, key._1, key._2, key._3, key._4, key._5, key._6, key._7, key._8, key._9, 
+                        key.SPACE]
+        self.alphanum = [keys[a] for a in self.alphanum]
+
+        if keys[key.ENTER] and not self.pressed2:
+            self.PushMessage(self.memstr)
+            self.memstr = ""
+            self.pressed2 = True
+            
+        elif keys[key.BACKSPACE] and not self.pressed3:
+            self.memstr = self.memstr[0:len(self.memstr)-1]
+            self.pressed3 = True
+            self.ptimer = 0.15
+        else:
+            if self.alphanum.count(True) != 0:
+                K = self.alphanum.index(True)
+                if self.prev[K] == False:
+                    self.memstr += "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "[K]
+            
+        
+        if not (keys[key.ENTER]):
+            self.pressed2 = False
+        if not (keys[key.BACKSPACE]) or self.ptimer <= 0.0:
+            self.pressed3 = False
+        
+        if self.ptimer >= 0.0:
+            self.ptimer -= dt
+        
+
+        self.prev = self.alphanum
+
+    def Render(self,camera=None):
+        FNT[FNT.index(">")+1].blit(16, 16, width=28,height=28)
+        i = 0
+        if self.memstr != "":
+            
+           
+            for c in self.memstr:
+                if c != " ":
+                    FNT[FNT.index(c)+1].blit(16+(i+1)*32, 16, width=28,height=28)
+                i+=1
+        
+        FNT[FNT.index("|")+1].blit(16+(i+1)*32, 16, width=28,height=28)
+        j = 0
+        for s in self.outstrs:
+            i = 0
+            for c in s:
+                if c != " ":
+                    FNT[FNT.index(c)+1].blit(16+(i+1)*32, 32*6 - (j * 32), width=28,height=28)
+                i+=1
+            j+=1
+
+    def PushMessage(self, msg):
+        out = self.sysPtr.HandleMessage(msg)
+        if out != "":
+            self.outstrs += [out]
+        if (len(self.outstrs) > 3):
+            del self.outstrs[0]
 
 
+
+uibatch = pyglet.graphics.Batch()
 class ExampleEntity:
     def __init__(self, pos):
         self.pos = pos
-        #self.timer 0.0
+        self.spr = pyglet.sprite.Sprite(img = PLAYER[0], x= 0,y=0, batch=uibatch)
+        self.txt = pyglet.text.Label("onetwothree", x=0,y=0, font_size=16, batch=uibatch)
     def Update(self, dt):
-        #self.timer += dt
         pass
     def Render(self, camera=None):
-        PLAYER[int(time.time()*4) % 2].blit(*camera.GetScreenCoords(self.pos), width=camera.scl*16, height=camera.scl*16)
-
+        #PLAYER[int(time.time()*4) % 2].blit(*camera.GetScreenCoords(self.pos), width=camera.scl*16, height=camera.scl*16)
+        self.spr.scale = camera.scl * 8.0
+        self.spr.position = camera.GetScreenCoords(self.pos)[0:2]
+        #self.spr.draw()
+        self.txt.draw()
+    def HandleMessage(msg):
+        pass
 
 
 @window.event
 def on_mouse_motion(x,y,dx,dy):
     #player.MouseUpdate(x,y,-1)
+    scene.MouseMotion(x,y,dx,dy)
     pass
 
 #window.event
 @window.event
 def on_mouse_release(x,y,btn,mod):
     #player.MouseUpdate(x,y,btn)
+    print(x,y)
     pass
     
 shouldClose = False
@@ -205,20 +370,29 @@ def on_close():
 def on_draw():
     window.clear()
     scene.Render()
+    uibatch.draw()
 
+audioSystem = Drippy(44100, 16)
+audioMgr = AudioLiaison(audioSystem)
 camera = Camera()
 player = ExampleEntity(pos=[0,0])
 camera.SetTarget(player)
 scene = Scene(
     [
+        audioMgr,
         camera,
-        player
+        player,
+
+        
      ]
 )
 window.set_vsync(False)
 FPS = []
 t = time.time()
-while 0 == 0:
+
+
+
+while True:
     
     
     pyglet.clock.tick()
