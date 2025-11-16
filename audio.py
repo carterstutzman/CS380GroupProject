@@ -129,7 +129,8 @@ class Drippy:
                     self.channels[x].Play(self.samples[self.samples.index(alias)+1],pitch,vol,pan)
                     break
         else:
-            self.channels[chan].Play(self.samples[alias])
+            if not self.channels[chan].playing:
+                self.channels[chan].Play(self.samples[self.samples.index(alias)+1], pitch, vol, pan)
     
     def LoadSample(self,path,alias):
         self.samples.append(alias)
@@ -199,6 +200,9 @@ class Drippy:
         if data[0] == "PLAY":
             self.PlaySample(data[1], -1, float(data[2]), float(data[3]), float(data[4]))
         
+        if data[0] == "PLAYEXPLICIT":
+            self.PlaySample(data[1], int(data[2]), float(data[3]), float(data[4]), float(data[5]))
+        
         if data[0] == "CHORD":
             self.PlaySample(str(int(data[1])+0), -1)
             self.PlaySample(str(int(data[1])+4), -1)
@@ -208,7 +212,7 @@ class Drippy:
 
 
         if data[0] == "STOP":
-            outMsg = "CHANNEL #"+data[1]+" STOPPED"
+            self.channels[int(data[1])].Stop()
 
         if data[0] == "LOAD":
             self.LoadSample(data[1], data[2])
