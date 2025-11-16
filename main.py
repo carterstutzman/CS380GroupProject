@@ -188,7 +188,7 @@ FNT = [ "A", MAKE([".11111.", ".11..1.", ".11..1.", "1111111", "11....1", "11...
        "X", MAKE(["11....1", "11....1", "11...11", ".11111.", "1111111", "111...1", "111...1", ]), 
        "Y", MAKE(["11....1", "11....1", "11....1", "1111111", "...11..", "...11..", "...11.", ]), 
        "Z", MAKE(["1111111", "....111", "...111.", ".1111..", "1111...", "111....", "1111111", ]), 
-       ".", MAKE([".......", ".......", ".......", ".......", ".......", "11.....", "11.....", ]), 
+       ".", MAKE([".......", ".......", ".......", ".......", "..111..", "..111..", "..111..", ]), 
        "!", MAKE(["11.....", "11.....", "11.....", "11.....", ".......", "11.....", "11.....", ]), 
        "?", MAKE(["1111111", ".....11", ".....11", "1111111", "11.....", ".......", "11.....", ]), 
        "#", MAKE([".......", ".......", ".1.1...", "11111..", ".1.1...", "11111..", ".1.1...", ]), 
@@ -254,8 +254,7 @@ class AudioLiaison:
         self.memstr = ""
         self.outstrs = []
 
-        self.alphanum = [key.A,key.B, key.C, key.D, key.E, key.F, key.G, key.H, key.I, key.J, key.K, key.L, key.M, key.N, key.O, key.P, key.Q, key.R, key.S, key.T, key.U, key.V, key.W, key.X, key.Y, key.Z, key._0, key._1, key._2, key._3, key._4, key._5, key._6, key._7, key._8, key._9, 
-                        key.SPACE]
+        
         self.prev = [0 for n in range(0,100)]
         self.prev2 = []
         self.pressed = False
@@ -279,11 +278,13 @@ class AudioLiaison:
             i = 0
             prs = False
             self.alphanum = [key.A,key.B, key.C, key.D, key.E, key.F, key.G, key.H, key.I, key.J, key.K, key.L, key.M, key.N, key.O, key.P, key.Q, key.R, key.S, key.T, key.U, key.V, key.W, key.X, key.Y, key.Z, key._0, key._1, key._2, key._3, key._4, key._5, key._6, key._7, key._8, key._9, 
-                            key.SPACE, key.PERIOD]
+                            key.SPACE, key.PERIOD, key.MINUS]
             self.alphanum = [keys[a] for a in self.alphanum]
 
             if keys[key.ENTER] and not self.pressed2:
+                self.Print(">"+self.memstr)
                 self.PushMessage(self.memstr)
+                
                 self.memstr = ""
                 self.pressed2 = True
                 
@@ -291,11 +292,13 @@ class AudioLiaison:
                 self.memstr = self.memstr[0:len(self.memstr)-1]
                 self.pressed3 = True
                 self.ptimer = 0.15
+            elif keys[key.UP]:
+                self.memstr = self.outstrs[len(self.outstrs)-1][1:]
             else:
                 if self.alphanum.count(True) != 0:
                     K = self.alphanum.index(True)
                     if self.prev[K] == False:
-                        self.memstr += "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ."[K]
+                        self.memstr += "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .-"[K]
                 
             
             if not (keys[key.ENTER]):
@@ -332,10 +335,12 @@ class AudioLiaison:
                 j+=1
 
     def PushMessage(self, msg):
-        out = self.sysPtr.HandleMessage(msg)
+        o = self.sysPtr.HandleMessage(msg)
+        self.Print(o)
+    def Print(self,out):
         if out != "":
             self.outstrs += [out]
-        if (len(self.outstrs) > 3):
+        if (len(self.outstrs) > 5):
             del self.outstrs[0]
 
 

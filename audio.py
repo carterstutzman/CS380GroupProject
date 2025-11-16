@@ -90,7 +90,7 @@ class Channel:
         if self.sample != None and self.playing:
             for x in range(0, frames):
                 S = self.sample.GetData((self.pos + x)*self.pitch)
-                self.data[x] = S
+                self.data[x] = S * self.volume
                 #print(S)
             self.pos += x
             if self.pos > self.sample.nsamples*1.0/self.pitch:
@@ -149,16 +149,31 @@ class Drippy:
         MAX = 0
         for y in range(0, frames):
             A = 0
+            B = 0
             tot = 1.0
             for x in range(0, len(dat)):
                 if self.channels[x].playing:
                     tot+=1.0
-
-                A += dat[x][y]
+                pan = self.channels[x].pan
+                panL = 0.5
+                panR = 0.5
+                if (pan < 0.0):
+                    panL = abs(pan / 2.0) + 0.5
+                    panR = 1.0 - panL
+                
+                elif (pan > 0.0):
+                    panR = pan / 2.0 + 0.5
+                    panL = 1.0 - panR
+                
+                
+                
+               
+                A += dat[x][y] * panL
+                B += dat[x][y] * panR
             
             tot = 1.0
             L += [A/math.sqrt(tot)]
-            R += [A/math.sqrt(tot)]
+            R += [B/math.sqrt(tot)]
             
 
 

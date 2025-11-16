@@ -1,0 +1,5 @@
+Major scales algorithm
+
+start at the root (the namesake)
+
+then go W W H W W W H
