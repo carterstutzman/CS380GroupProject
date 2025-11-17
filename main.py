@@ -6,7 +6,9 @@ from pyglet.gl import *
 
 from pyglet.graphics import *
 
+##our imports
 from audio import *
+from generator import *
 
 pyglet.image.Texture.default_mag_filter = pyglet.image.Texture.default_min_filter = pyglet.gl.GL_NEAREST
 
@@ -113,7 +115,8 @@ class Camera:
 class Scene:
     def __init__(self, stuff=[]):
         self.stuff = stuff
-        
+        self.gel = pyglet.shapes.Rectangle(0,0, screenSize[0],screenSize[1], color=(64,128,255))
+        self.gel.opacity = 128
     def MouseMotion(self, x,y,dx,dy):
         pass
     def PushMessage(self, msg):
@@ -160,6 +163,7 @@ class Scene:
         for thing in self.stuff:
             thing.Render(camera)      
 
+        self.gel.draw()
 
 
 FNT = [ "A", MAKE([".11111.", ".11..1.", ".11..1.", "1111111", "11....1", "11....1", "11....1", ]), 
@@ -188,6 +192,55 @@ FNT = [ "A", MAKE([".11111.", ".11..1.", ".11..1.", "1111111", "11....1", "11...
        "X", MAKE(["11....1", "11....1", "11...11", ".11111.", "1111111", "111...1", "111...1", ]), 
        "Y", MAKE(["11....1", "11....1", "11....1", "1111111", "...11..", "...11..", "...11.", ]), 
        "Z", MAKE(["1111111", "....111", "...111.", ".1111..", "1111...", "111....", "1111111", ]), 
+       
+       "A", MAKE([".11111.", 
+                  ".11..1.", 
+                  ".11..1.", 
+                  "1111111", 
+                  "11....1", 
+                  "11....1", 
+                  "11....1", ]), 
+
+       "B", MAKE(["11111..", 
+                  "11..1..", 
+                  "11..1..", 
+                  "1111111", 
+                  "11....1", 
+                  "11....1", 
+                  "1111111", ]), 
+
+       "C", MAKE(["1111111", 
+                  "11.....", 
+                  "11.....", 
+                  "111....", 
+                  "111....", 
+                  "111....", 
+                  "1111111", ]), 
+                  
+       "D", MAKE(["111111.", "11...11", "11....1", "111...1", "111...1", "111..11", "111111.", ]), 
+       "E", MAKE(["1111111", "11.....", "11.....", "11111..", "111....", "111....", "1111111", ]), 
+       "F", MAKE(["1111111", "11.....", "11.....", "11111..", "111....", "111....", "111....", ]), 
+       "G", MAKE(["1111111", "11....1", "11.....", "11.....", "11..111", "11...11", "1111111", ]), 
+       "H", MAKE(["11....1", "11....1", "11....1", "1111111", "111...1", "111...1", "111...1", ]), 
+       "I", MAKE(["1111111", "..11...", "..11...", "..111..", "..111..", "..111..", "1111111", ]), 
+       "J", MAKE([".....11", ".....11", ".....11", ".....11", "1....11", "1....11", "1111111", ]), 
+       "K", MAKE(["11...1.", "11...1.", "11...1.", "1111111", "111...1", "111...1", "111...1", ]), 
+       "L", MAKE(["11.....", "11.....", "11.....", "111....", "111....", "111....", "1111111", ]), 
+       "M", MAKE(["1111111", "11.11.1", "11.11.1", "11....1", "111...1", "111...1", "111...1", ]), 
+       "N", MAKE(["1111111", "11....1", "11....1", "111...1", "111...1", "111...1", "111...1", ]), 
+       "O", MAKE(["1111111", "11....1", "11....1", "11....1", "11....1", "11....1", "1111111", ]), 
+       "P", MAKE(["1111111", "11....1", "11....1", "1111111", "111....", "111....", "111....", ]), 
+       "Q", MAKE(["111111.", "11...1.", "11...1.", "111..1.", "111..1.", "111..1.", "1111111", ]), 
+       "R", MAKE(["1111111", "11....1", "11....1", "1111111", "111..1.", "111..1.", "111..1.", ]), 
+       "S", MAKE(["1111111", "11.....", "11.....", "1111111", "....111", "....111", "1111111", ]), 
+       "T", MAKE(["1111111", "..11...", "..11...", "..11...", "..111..", "..111..", "..111..", ]), 
+       "U", MAKE(["11....1", "11....1", "11....1", "111...1", "111...1", "111...1", "1111111", ]), 
+       "V", MAKE(["11....1", "11....1", "11....1", "11...11", ".11..1.", ".11..1.", ".11111.", ]), 
+       "W", MAKE(["11....1", "11....1", "11....1", "111...1", "111.1.1", "111.1.1", "1111111", ]), 
+       "X", MAKE(["11....1", "11....1", "11...11", ".11111.", "1111111", "111...1", "111...1", ]), 
+       "Y", MAKE(["11....1", "11....1", "11....1", "1111111", "...11..", "...11..", "...11.", ]), 
+       "Z", MAKE(["1111111", "....111", "...111.", ".1111..", "1111...", "111....", "1111111", ]), 
+       
        ".", MAKE([".......", ".......", ".......", ".......", "..111..", "..111..", "..111..", ]), 
        "!", MAKE(["11.....", "11.....", "11.....", "11.....", ".......", "11.....", "11.....", ]), 
        "?", MAKE(["1111111", ".....11", ".....11", "1111111", "11.....", ".......", "11.....", ]), 
@@ -263,8 +316,10 @@ class AudioLiaison:
         
         self.ptimer = 0.0
 
-        self.active = False
+        self.active = True
         self.activatePress = True
+
+        self.echo = False
     def Update(self,dt=0.0):
         if keys[key.GRAVE] and self.activatePress == False:
             self.active = not self.active
@@ -278,7 +333,7 @@ class AudioLiaison:
             i = 0
             for k in self.keys:
                 if keys[k]:    
-                    self.PushMessage("PLAYEXPLICIT "+str(49-12+i)+" "+str(i)+" 1.0 1.0 0.0")
+                    self.PushMessage("PLAYEXPLICIT "+str(39+i)+" "+str(i)+" 1.0 1.0 0.0")
                 else:
                     self.PushMessage("STOP "+str(i))
                 i+=1
@@ -290,7 +345,6 @@ class AudioLiaison:
             self.alphanum = [keys[a] for a in self.alphanum]
 
             if keys[key.ENTER] and not self.pressed2:
-                self.Print(">"+self.memstr)
                 self.PushMessage(self.memstr)
                 
                 self.memstr = ""
@@ -338,17 +392,19 @@ class AudioLiaison:
                 i = 0
                 for c in s:
                     if c != " ":
-                        FNT[FNT.index(c)+1].blit(16+(i+1)*32, 32*6 - (j * 32), width=28,height=28)
+                        FNT[FNT.index(c)+1].blit(16+(i+1)*32, 32*(len(self.outstrs)+1) - (j * 32), width=28,height=28)
                     i+=1
                 j+=1
 
     def PushMessage(self, msg):
+        if self.echo:
+            self.Print(">"+msg)
         o = self.sysPtr.HandleMessage(msg)
         self.Print(o)
     def Print(self,out):
         if out != "":
             self.outstrs += [out]
-        if (len(self.outstrs) > 5):
+        if (len(self.outstrs) > 10):
             del self.outstrs[0]
 
 
@@ -401,21 +457,31 @@ audioMgr = AudioLiaison(audioSystem)
 camera = Camera()
 player = ExampleEntity(pos=[0,0])
 camera.SetTarget(player)
+
+
+
+##generator init
+generator = Generator(audioMgr)
+
 scene = Scene(
     [
         audioMgr,
+        generator,
         camera,
         player,
+
 
         
      ]
 )
-window.set_vsync(False)
+window.set_vsync(True)
 FPS = []
 t = time.time()
 
 
+#audioMgr.PushMessage("LOADSYNTH")
 audioMgr.PushMessage("LOADPIANO")
+
 while True:
     
     

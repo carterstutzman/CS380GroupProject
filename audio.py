@@ -32,14 +32,16 @@ def save(path,data,framerate=44100):
             f.writeframes(struct.pack("<h",samples))
     
 class Sample:
-    def __init__(self, path):
+    def __init__(self, path, loop=True):
         if path not in ["SINE", "SAW", "SQUARE", "TRIANGLE"]:
             self.type = "SAMPLE"
             self.data = load(path)[0]
             self.nsamples = len(self.data)
+            
         else:
             self.type = self.path
 
+        self.loop = loop
 
     def GetData(self,i):
         i = int(i)
@@ -93,7 +95,7 @@ class Channel:
                 self.data[x] = S * self.volume
                 #print(S)
             self.pos += x
-            if self.pos > self.sample.nsamples*1.0/self.pitch:
+            if self.pos > self.sample.nsamples*1.0/self.pitch and self.sample.loop == False:
                 self.Stop()
 
     def GetData(self):
@@ -132,9 +134,9 @@ class Drippy:
             if not self.channels[chan].playing:
                 self.channels[chan].Play(self.samples[self.samples.index(alias)+1], pitch, vol, pan)
     
-    def LoadSample(self,path,alias):
+    def LoadSample(self,path,alias,loop=True):
         self.samples.append(alias)
-        S = Sample(path)
+        S = Sample(path, loop)
         self.samples.append(S)
         
     
@@ -191,15 +193,21 @@ class Drippy:
             i = 0
             for a in os.listdir("./samples/piano"):
                 try:
-                    self.LoadSample("./samples/piano/"+a, str(i))
+                    self.LoadSample("./samples/piano/"+a, str(i), loop = False)
                     
                 except:
                     pass
                 i+=1
             outMsg = "LOADED PIANO SAMPLES"
+        if data[0] == "LOADSYNTH":
+            i = 0
+            for a in os.listdir("./samples/synth"):
+                self.LoadSample("./samples/synth/"+a, "S"+str(i), loop=True)
+                i += 1
         if data[0] == "PLAY":
             self.PlaySample(data[1], -1, float(data[2]), float(data[3]), float(data[4]))
-        
+        if data[0] == "PLAYKEY":
+            self.PlaySample(data[1], -1, KEY(int(data[2])), float(data[3]), float(data[4]))
         if data[0] == "PLAYEXPLICIT":
             self.PlaySample(data[1], int(data[2]), float(data[3]), float(data[4]), float(data[5]))
         
