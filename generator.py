@@ -85,7 +85,7 @@ class Generator:
     def PlayChord(self):
         form = self.decodeChordNotation(self.chordMap[self.chordIndex])
         for f in range(0, len(form)):
-            self.liaison.PushMessage("PLAY "+str(form[f])+" 1.0 1.0 0.0")
+            self.liaison.PushMessage("PLAY "+str(form[f])+" 1.0 0.25 0.0")
             #self.liaison.PushMessage("PLAYKEY S0 "+str(form[f])+" 1.0 0.0")
 
 
