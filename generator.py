@@ -159,9 +159,9 @@ class Generator:
             #print(self.chordTimer)
             if (dt > 0.5):
                 dt = 0.0
-            self.chordTimer += dt * 0.5
+            self.chordTimer += dt
             if (self.startedPlaying == True):
-                self.melodyTimer += dt * 0.5
+                self.melodyTimer += dt
             while self.chordTimer >= 2.0:
                 self.liaison.Print(self.chordMap[self.chordIndex].upper())
                 #self.StopChord()
