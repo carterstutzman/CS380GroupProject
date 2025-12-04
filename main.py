@@ -17,7 +17,7 @@ pyglet.gl.glEnable(pyglet.gl.GL_TEXTURE_2D)
 #░░▓▓█.▄▌▐▀╚╩╦╠═╬╧░▄╛┐└┴┬├.┼╞╟╚║╝╗║╔└─┘─ ┼├┌─┐│┬┴┤☺☻♥♦♣♠•◘○◙←↑→↓♡╱╲╳
 
 
-screenSize = [1080,720]
+screenSize = [720,720]
 centerX = int(screenSize[0]/2)
 centerY = int(screenSize[1]/2)
 window = pyglet.window.Window(screenSize[0], screenSize[1])
@@ -96,6 +96,9 @@ class Camera:
         self.pos = [0,0,0]
         self.tgt = None
 
+        self.gel = pyglet.shapes.Rectangle(0,0, screenSize[0],screenSize[1], color=(64,128,255))
+        self.gel.opacity = 128
+
     def GetScreenCoords(self, pos):
         if (len(pos) < 3):
             pos.append(0.0)
@@ -110,13 +113,30 @@ class Camera:
             self.scl = 1.0
         pass
     def Render(self,camera=None):
-        pass
+        self.gel.draw()
+
+    def HandleMessage(self,msg):
+        data = msg.split(" ")
+        if data[0] == "SET_GEL_COLOR":
+            self.gel.color = (int(data[1]),int(data[2]),int(data[3]))
+            self.gel.opacity = int(data[4])
+        if data[0] == "SET_GEL_R":
+            self.gel.color = (int(data[1]),self.gel.color[1],self.gel.color[2])
+        if data[0] == "SET_GEL_G":
+            self.gel.color = (self.gel.color[1],int(data[1]),self.gel.color[2])
+        if data[0] == "SET_GEL_B":
+            self.gel.color = (self.gel.color[1],self.gel.color[2],int(data[1]))
+        if data[0] == "SET_GEL_A":
+            self.gel.opacity = int(self.data[1])
+
+        
+        
+
 
 class Scene:
     def __init__(self, stuff=[]):
         self.stuff = stuff
-        self.gel = pyglet.shapes.Rectangle(0,0, screenSize[0],screenSize[1], color=(64,128,255))
-        self.gel.opacity = 128
+        
     def MouseMotion(self, x,y,dx,dy):
         pass
     def PushMessage(self, msg):
@@ -163,7 +183,7 @@ class Scene:
         for thing in self.stuff:
             thing.Render(camera)      
 
-        self.gel.draw()
+        
 
 
 
@@ -528,7 +548,7 @@ class AudioLiaison:
                     K = self.alphanum.index(True)
                     if self.prev[K] == False:
                         self.memstr += ["abcdefghijklmnopqrstuvwxyz0123456789 .-",###
-                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .-"][1][K]###)!@#$%^&*(
+                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ._"][1][K]###)!@#$%^&*(
                 
             
             if not (keys[key.ENTER]):
@@ -568,31 +588,32 @@ class AudioLiaison:
         if self.echo:
             self.Print(">"+msg)
         o = self.sysPtr.HandleMessage(msg)
+        scene.PushMessage(msg)
         self.Print(o)
     def Print(self,out):
         if out != "":
             self.outstrs += [out]
-        if (len(self.outstrs) > 10):
+        if (len(self.outstrs) > 5):
             del self.outstrs[0]
 
 
 
 uibatch = pyglet.graphics.Batch()
-class ExampleEntity:
-    def __init__(self, pos):
-        self.pos = pos
-        self.spr = pyglet.sprite.Sprite(img = PLAYER[0], x= 0,y=0, batch=uibatch)
-        self.txt = pyglet.text.Label("onetwothree", x=0,y=0, font_size=16, batch=uibatch)
-    def Update(self, dt):
-        pass
-    def Render(self, camera=None):
-        #PLAYER[int(time.time()*4) % 2].blit(*camera.GetScreenCoords(self.pos), width=camera.scl*16, height=camera.scl*16)
-        self.spr.scale = camera.scl * 8.0
-        self.spr.position = camera.GetScreenCoords(self.pos)[0:2]
-        #self.spr.draw()
-        self.txt.draw()
-    def HandleMessage(msg):
-        pass
+# class ExampleEntity:
+#     def __init__(self, pos):
+#         self.pos = pos
+#         self.spr = pyglet.sprite.Sprite(img = PLAYER[0], x= 0,y=0, batch=uibatch)
+#         self.txt = pyglet.text.Label("onetwothree", x=0,y=0, font_size=16, batch=uibatch)
+#     def Update(self, dt):
+#         pass
+#     def Render(self, camera=None):
+#         #PLAYER[int(time.time()*4) % 2].blit(*camera.GetScreenCoords(self.pos), width=camera.scl*16, height=camera.scl*16)
+#         self.spr.scale = camera.scl * 8.0
+#         self.spr.position = camera.GetScreenCoords(self.pos)[0:2]
+#         #self.spr.draw()
+#         self.txt.draw()
+#     def HandleMessage(msg):
+#         pass
 
 
 @window.event
@@ -623,8 +644,6 @@ def on_draw():
 audioSystem = Drippy(44100, 32)
 audioMgr = AudioLiaison(audioSystem)
 camera = Camera()
-player = ExampleEntity(pos=[0,0])
-camera.SetTarget(player)
 
 
 
@@ -636,7 +655,6 @@ scene = Scene(
         audioMgr,
         generator,
         camera,
-        player,
 
 
         

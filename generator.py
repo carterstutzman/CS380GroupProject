@@ -1,4 +1,6 @@
-import random #temp
+import random 
+import pyglet
+from pyglet import shapes
 """
 chord notation brainstorming
 
@@ -37,19 +39,22 @@ chordForms = [
 ]
 notes = ["A","Bb","B","C","Db","D","Eb","E","F","F#","G","G#"]
         
+
+circleFifths = [["C maj","G maj","D maj","A maj","E maj","B maj","F# maj","Db maj","G# maj","Eb maj","Bb maj","F maj"],
+                ["A min","E min","B min","F# min","Db min","G# min","Eb min","Bb min","F min","C min","G min","D min"],
+                ["C maj 7","G maj 7","D maj 7","A maj 7","E maj 7","B maj 7","F# maj 7","Db maj 7","G# maj 7","Eb maj 7","Bb maj 7","F maj 7"],
+                ["A min 7","E min 7","B min 7","F# min 7","Db min 7","G# min 7","Eb min 7","Bb min 7","F min 7","C min 7","G min 7","D min 7"],
+                
+                
+]
+
 class Generator:
     def __init__(self, audioLiaison):
         self.liaison = audioLiaison
 
         self.pause = False
         
-        self.chordMap = [
-            "C maj",
-            "G maj",
-            "A min",
-            "F maj"
-            
-        ]
+        self.chordMap = circleFifths[0]
         # for i in range(0, 12):
         #     self.chordMap += [
         #     notes[i] + " maj",
@@ -88,6 +93,17 @@ class Generator:
         self.startedPlaying = False
 
         self.octave = 3 #3
+
+
+
+        #SLIDERS
+        self.jazziness = 0.0  #Chances to do a 7th chord
+        self.suspense  = 0.0  #Chances to do sus chord
+        self.chaos     = 0.0  #Chances to not resolve/revisit past patterns
+        self.sadness   = 0.0  #Chances to do minor sounding things
+
+
+
     def decodeChordNotation(self,STR):
         dat = STR.split(" ")
         note = notes.index(dat[0])
@@ -105,7 +121,7 @@ class Generator:
         form = self.decodeChordNotation(self.chordMap[self.chordIndex])
         for f in range(0, len(form)):
             self.liaison.PushMessage("PLAY "+str(form[f])+" 1.0 0.25 0.0")
-            #self.liaison.PushMessage("PLAYKEY S0 "+str(form[f])+" 1.0 0.0")
+            #self.liaison.PushMessage("PLAYKEY S0 "+str(form[f] + 24)+" 1.0 0.0")
 
     def StandardBar(self):
         currentChord = self.decodeChordNotation(self.chordMap[self.chordIndex])
@@ -197,4 +213,19 @@ class Generator:
                 
     
     def Render(self, camera=None):
-        pass
+        pyglet.shapes.Rectangle(360-50,360+50,100,100,color=(255,0,0)).draw()
+        
+
+
+    def HandleMessage(self,msg):
+        data = msg.split(" ")
+        if data[0] == "MIN":
+            self.chordMap = circleFifths[1]
+        if data[0] == "MAJ":
+            self.chordMap = circleFifths[0]
+        
+        if data[0] == "MIN7":
+            self.chordMap = circleFifths[3]
+        if data[0] == "MAJ7":
+            self.chordMap = circleFifths[2]
+        
