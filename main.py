@@ -527,8 +527,8 @@ class AudioLiaison:
                 if self.alphanum.count(True) != 0:
                     K = self.alphanum.index(True)
                     if self.prev[K] == False:
-                        self.memstr += ["abcdefghijklmnopqrstuvwxyz0123456789 .-",
-                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ)!@#$%^&*( .-"][1][K]
+                        self.memstr += ["abcdefghijklmnopqrstuvwxyz0123456789 .-",###
+                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .-"][1][K]###)!@#$%^&*(
                 
             
             if not (keys[key.ENTER]):
