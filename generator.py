@@ -192,7 +192,7 @@ class Generator:
 
     def MakeMelody(self, STR):
         dat = STR.split(" ")
-        self.rootNote = (notes.index(dat[0]) + 1) + (12 * self.octave)
+        self.rootNote = (notes.index(dat[0])) + (12 * self.octave)
         print("NOTE:",self.rootNote)
         nextBar = None
         if (random.randint(0, 9) >= 5): 
