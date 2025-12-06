@@ -231,7 +231,7 @@ class Generator:
         
         numToAdd = 0
         if (space >= 0.0):
-            numToAdd = int(space * 6.0 * (random.randint(12, 100) / 100.0))
+            numToAdd = int(space * 6.0 * (random.randint(12, 100) / 100.0)) + 1
             for n in range(0, numToAdd):
                 self.AddNoteToBar(self.melodyMap[len(self.melodyMap) - 1])
 
