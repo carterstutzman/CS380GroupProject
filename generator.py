@@ -184,7 +184,8 @@ class Generator:
         currentChord = self.GetChordOffsets(self.chordMap[self.chordIndex])
         bar = [None, None, None, None, None, None, None, None]
 
-        startPoint = random.randint(0, 5)
+        startPoint = min((random.randint(0, 2) * 2), 4)
+
 
         direction = random.randint(0, 1)
         if (direction == 1):
@@ -209,17 +210,28 @@ class Generator:
         dat = STR.split(" ")
         self.rootNote = (notes.index(dat[0])) + (12 * self.octave)
         print("NOTE:",self.rootNote)
-        ran = random.randint(0, 9)
-        if (ran <= 3): 
-            self.melodyMap.append(self.StandardBar())
-        elif (ran <= 6):
-            self.melodyMap.append(self.Arpeggio())
+        ran = random.randint(0, 10)
+        if (space > 0.0):           
+            if (ran <= 1): 
+                self.melodyMap.append(self.EmptyBar())
+            elif (ran <= 7 * space): 
+                self.melodyMap.append(self.StandardBar())
+            else:
+                self.melodyMap.append(self.Arpeggio())
         else:
-            self.melodyMap.append(self.EmptyBar())
+            print(space)
+            if (ran <= 4 * (1.0+space)): 
+                self.melodyMap.append(self.Arpeggio())
+            elif (ran <= 8 * (1.0+(space * space * space))):
+                self.melodyMap.append(self.StandardBar())
+            else: 
+                self.melodyMap.append(self.EmptyBar())
+                if (random.randint(0,100) > 50):
+                    self.AddNoteToBar(self.melodyMap[len(self.melodyMap) - 1])
         
         numToAdd = 0
         if (space >= 0.0):
-            numToAdd = int(space * 6.0 * (random.randint(0, 100) / 100.0))
+            numToAdd = int(space * 6.0 * (random.randint(12, 100) / 100.0))
             for n in range(0, numToAdd):
                 self.AddNoteToBar(self.melodyMap[len(self.melodyMap) - 1])
 
@@ -256,6 +268,7 @@ class Generator:
                 num += 1
         
         if (bar[index] == 0): bar[index] = currentChord[random.randint(0, 2)] + rootIndex
+        elif (num == 1): bar[index] += random.randint(-2, 2)
         else: bar[index] //= num  
 
     def MakeChordSegment(self, val):
