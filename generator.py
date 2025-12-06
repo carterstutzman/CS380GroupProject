@@ -58,7 +58,7 @@ class Generator:
         self.liaison = audioLiaison
 
         self.pause = False
-        
+        self.scene = None
         self.chordMap = circleFifths[0]
         # for i in range(0, 12):
         #     self.chordMap += [
@@ -267,7 +267,7 @@ class Generator:
                 
     
     def Render(self, camera=None):
-        pyglet.shapes.Rectangle(360-50 + self.spaceSlider*360,360-50+self.emotionSlider*360,100,100,color=(255,0,0)).draw()
+        pyglet.shapes.Rectangle(360-32 + self.spaceSlider*360,360-32+self.emotionSlider*360,64,64,color=(255,0,0)).draw()
         
 
 
@@ -293,4 +293,9 @@ class Generator:
             
             if self.emotionSlider > 1.0: self.emotionSlider = 1.0
             if self.emotionSlider < -1.0: self.emotionSlider = -1.0
+            
+            self.scene.PushMessage("SET_GEL_R "+str(int((self.emotionSlider*0.5 + 0.5)*255)))
+            self.scene.PushMessage("SET_GEL_G "+str(int(((-self.spaceSlider)*0.5 + 0.5)*255)))
+            
+            print(int((self.emotionSlider*0.5 + 0.5)*255), int(((-self.spaceSlider)*0.5 + 0.5)*255))
             
