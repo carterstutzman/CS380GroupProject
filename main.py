@@ -560,15 +560,15 @@ class AudioLiaison:
         if not keys[key.GRAVE]:
             self.activatePress = False        
         
-        if not self.active:
-            self.keys = [key.Q, key._2, key.W, key._3, key.E, key.R, key._5, key.T, key._6, key.Y, key._7, key.U, key.I, key._9, key.O, key._0, key.P, key.BRACKETLEFT, key.EQUAL, key.BRACKETRIGHT]
-            i = 0
-            for k in self.keys:
-                if keys[k]:    
-                    self.PushMessage("PLAYEXPLICIT "+str(39+i)+" "+str(i)+" 1.0 0.25 0.0")
-                else:
-                    self.PushMessage("STOP "+str(i))
-                i+=1
+        #if not self.active:
+        #    self.keys = [key.Q, key._2, key.W, key._3, key.E, key.R, key._5, key.T, key._6, key.Y, key._7, key.U, key.I, key._9, key.O, key._0, key.P, key.BRACKETLEFT, key.EQUAL, key.BRACKETRIGHT]
+        #    i = 0
+        #    for k in self.keys:
+        #        if keys[k]:    
+        #            self.PushMessage("PLAYEXPLICIT "+str(39+i)+" "+str(i)+" 1.0 0.25 0.0")
+        #        else:
+        #            self.PushMessage("STOP "+str(i))
+        #        i+=1
         if self.active:
             i = 0
             prs = False
@@ -699,7 +699,7 @@ def on_draw():
     scene.Render()
     uibatch.draw()
 
-audioSystem = Drippy(44100, 32)
+audioSystem = Drippy(44100, 16)
 audioMgr = AudioLiaison(audioSystem)
 camera = Camera()
 

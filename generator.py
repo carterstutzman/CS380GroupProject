@@ -1,5 +1,6 @@
 import random 
 import pyglet
+import math
 from pyglet import shapes
 
 
@@ -45,10 +46,10 @@ chordForms = [
 notes = ["A","Bb","B","C","Db","D","Eb","E","F","F#","G","G#"]
         
 
-circleFifths = [["C maj", "G maj","D maj","A maj","E maj","B maj","F# maj","Db maj","G# maj","Eb maj","Bb maj","F maj"],
-                ["A min","E min","B min","F# min","Db min","G# min","Eb min","Bb min","F min","C min","G min","D min"],
-                ["C maj 7","G maj 7","D maj 7","A maj 7","E maj 7","B maj 7","F# maj 7","Db maj 7","G# maj 7","Eb maj 7","Bb maj 7","F maj 7"],
-                ["A min 7","E min 7","B min 7","F# min 7","Db min 7","G# min 7","Eb min 7","Bb min 7","F min 7","C min 7","G min 7","D min 7"],
+circleFifths = [["C maj",  "G maj",  "D maj",  "A maj",   "E maj",   "B maj",    "F# maj",  "Db maj",  "G# maj",   "Eb maj",  "Bb maj",  "F maj"],
+                ["A min",  "E min",  "B min",  "F# min",  "Db min",  "G# min",   "Eb min",  "Bb min",  "F min",    "C min",   "G min",   "D min"],
+                ["C maj 7","G maj 7","D maj 7","A maj 7", "E maj 7", "B maj 7",  "F# maj 7","Db maj 7","G# maj 7", "Eb maj 7","Bb maj 7","F maj 7"],
+                ["A min 7","E min 7","B min 7","F# min 7","Db min 7","G# min 7", "Eb min 7","Bb min 7","F min 7",  "C min 7", "G min 7", "D min 7"],
                 
                 
 ]
@@ -104,6 +105,8 @@ class Generator:
         self.spaceSlider = 0.0
         self.emotionSlider = 0.0
 
+
+        self.moodTimer = 0.0
 
     def GetKey(self, Note): #Takes key string
         return (notes.index(Note) + 1) + (12 * self.octave)
@@ -287,15 +290,24 @@ class Generator:
                 numBars = 8
 
         prevChord = self.chordMap[len(self.chordMap) - 1]
-        position = circleFifths[self.circleIndex].index(prevChord)
-        newPosition = (position + random.choice([-1, 1])) % len(circleFifths[self.circleIndex])
+        try:
+            position = circleFifths[self.circleIndex].index(prevChord)
+            newPosition = (position + random.choice([-1, 1])) % len(circleFifths[self.circleIndex])
+        
+        except:
+            position = circleFifths[not self.circleIndex].index(prevChord)
+            newPosition = position
         if (newPosition < 0): newPosition += len(circleFifths[self.circleIndex])
 
         self.chordRepeats = numBars
         self.chordToAdd = circleFifths[self.circleIndex][newPosition]
 
     def Update(self, dt):
+
         if not self.pause:
+            self.moodTimer += dt
+            moodSwing = math.sin(self.moodTimer)+self.emotionSlider
+            self.octave = int(3 + moodSwing)
             #print(self.chordTimer)
             if (dt > 0.5):
                 dt = 0.0
