@@ -40,7 +40,7 @@ chordForms = [
 notes = ["A","Bb","B","C","Db","D","Eb","E","F","F#","G","G#"]
         
 
-circleFifths = [["C maj", "C maj", "C maj", "C maj", "C maj", "C maj", "C maj", "G maj","D maj","A maj","E maj","B maj","F# maj","Db maj","G# maj","Eb maj","Bb maj","F maj"],
+circleFifths = [["C maj", "G maj","D maj","A maj","E maj","B maj","F# maj","Db maj","G# maj","Eb maj","Bb maj","F maj"],
                 ["A min","E min","B min","F# min","Db min","G# min","Eb min","Bb min","F min","C min","G min","D min"],
                 ["C maj 7","G maj 7","D maj 7","A maj 7","E maj 7","B maj 7","F# maj 7","Db maj 7","G# maj 7","Eb maj 7","Bb maj 7","F maj 7"],
                 ["A min 7","E min 7","B min 7","F# min 7","Db min 7","G# min 7","Eb min 7","Bb min 7","F min 7","C min 7","G min 7","D min 7"],
@@ -54,7 +54,7 @@ class Generator:
 
         self.pause = False
         
-        self.chordMap = circleFifths[0]
+        self.chordMap = []
         # for i in range(0, 12):
         #     self.chordMap += [
         #     notes[i] + " maj",
@@ -164,7 +164,7 @@ class Generator:
         # for n in range(1, 6):
         #     bar[n] = bar[n - 1] + random.randint(-1, 1) * 2
 
-        print(bar)
+        #print(bar)
         return bar
         
     def Arpeggio(self):
@@ -187,7 +187,7 @@ class Generator:
             bar[startPoint + 1] = (currentChord[1] + rootIndex)
             bar[startPoint] = (currentChord[2] + rootIndex)
 
-        print(bar)
+        #print(bar)
         return bar
     
     def EmptyBar(self):
@@ -198,15 +198,17 @@ class Generator:
         self.rootNote = (notes.index(dat[0])) + (12 * self.octave)
         print("NOTE:",self.rootNote)
         ran = random.randint(0, 9)
-        if (ran >= 3): 
+        if (ran <= 3): 
             self.melodyMap.append(self.StandardBar())
-        elif (ran >= 6):
+        elif (ran <= 6):
             self.melodyMap.append(self.Arpeggio())
         else:
             self.melodyMap.append(self.EmptyBar())
         
         for n in range(0, 5):
             self.AddNoteToBar(self.melodyMap[len(self.melodyMap) - 1])
+
+        print(self.melodyMap[len(self.melodyMap) - 1])
 
         #self.melodyMap.append([self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote])
         
@@ -216,27 +218,33 @@ class Generator:
         #     self.melodyMap.append(self.MakeMinorScale())
 
     def AddNoteToBar(self, bar):
+        rootIndex = self.rootNote
+        currentChord = self.GetChordOffsets(self.chordMap[self.chordIndex])
         indices = []
         for n in range(0, 8):
             if (bar[n] == None): indices.append(n)
         
         if (len(indices) == 0): return
 
-        index = indices[random.randint(0, 7)]
+        index = indices[random.randint(0, len(indices) - 1)]
+        bar[index] = 0
         num = 0
         if (index > 0):
             left = bar[index - 1]
-            if (index != None): 
+            if (left != None): 
                 bar[index] += left
                 num += 1
         if (index < 7):
             right = bar[index - 1]
-            if (index != None):
+            if (right != None):
                 bar[index] += right
                 num += 1
         
-        bar[index] //= num
-            
+        if (bar[index] == 0): bar[index] = currentChord[random.randint(0, 2)] + rootIndex
+        else: bar[index] //= num  
+
+    def MakeChordSegment(self, val):
+        return
 
     def Update(self, dt):
         if not self.pause:
@@ -248,7 +256,6 @@ class Generator:
                 self.melodyTimer += dt
             while self.chordTimer >= 2.0:
                 self.liaison.Print(self.chordMap[self.chordIndex].upper())
-                self.chordOffsets = self.GetChordOffsets(self.chordMap[self.chordIndex])
                 #self.StopChord()
                 self.PlayChord()
 
@@ -266,7 +273,6 @@ class Generator:
                   self.barIndex = (self.barIndex + 1) % len(self.melodyMap)
 
                 self.MakeMelody(self.chordMap[self.chordIndex])
-                
                 
                 #TEMP
                 if (self.startedPlaying == False): self.melodyTimer = 0.25
