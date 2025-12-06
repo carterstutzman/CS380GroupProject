@@ -96,7 +96,7 @@ class Camera:
         self.pos = [0,0,0]
         self.tgt = None
 
-        self.gel = pyglet.shapes.Rectangle(0,0, screenSize[0],screenSize[1], color=(64,128,255))
+        self.gel = pyglet.shapes.Rectangle(0,0, screenSize[0],screenSize[1], color=(255,255,255))
         self.gel.opacity = 128
 
     def GetScreenCoords(self, pos):
@@ -123,16 +123,14 @@ class Camera:
         if data[0] == "SET_GEL_R":
             self.gel.color = (int(data[1]),self.gel.color[1],self.gel.color[2])
         if data[0] == "SET_GEL_G":
-            self.gel.color = (self.gel.color[1],int(data[1]),self.gel.color[2])
+            self.gel.color = (self.gel.color[0],int(data[1]),self.gel.color[2])
         if data[0] == "SET_GEL_B":
-            self.gel.color = (self.gel.color[1],self.gel.color[2],int(data[1]))
+            self.gel.color = (self.gel.color[0],self.gel.color[2],int(data[1]))
         if data[0] == "SET_GEL_A":
             self.gel.opacity = int(self.data[1])
 
-        
-        
 
-
+        
 class Scene:
     def __init__(self, stuff=[]):
         self.stuff = stuff
@@ -715,11 +713,9 @@ scene = Scene(
         audioMgr,
         generator,
         camera,
-
-
-        
      ]
 )
+generator.scene = scene
 window.set_vsync(True)
 FPS = []
 t = time.time()

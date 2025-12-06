@@ -56,9 +56,11 @@ circleFifths = [["C maj", "G maj","D maj","A maj","E maj","B maj","F# maj","Db m
 class Generator:
     def __init__(self, audioLiaison):
         self.liaison = audioLiaison
-
-        self.pause = False
+        self.Reset()
         
+    def Reset(self):
+        self.pause = False
+        self.scene = None
         self.chordMap = ["C maj"]
         self.chordToAdd = "C maj"
         # for i in range(0, 12):
@@ -101,6 +103,7 @@ class Generator:
         #SLIDERS
         self.spaceSlider = 0.0
         self.emotionSlider = 0.0
+
 
     def GetKey(self, Note): #Takes key string
         return (notes.index(Note) + 1) + (12 * self.octave)
@@ -334,7 +337,7 @@ class Generator:
                 
     
     def Render(self, camera=None):
-        pyglet.shapes.Rectangle(360-50 + self.spaceSlider*360,360-50+self.emotionSlider*360,100,100,color=(255,0,0)).draw()
+        pyglet.shapes.Rectangle(360-32 + self.spaceSlider*360,360-32+self.emotionSlider*360,64,64,color=(255,0,0)).draw()
         
 
 
@@ -361,3 +364,10 @@ class Generator:
             if self.emotionSlider > 1.0: self.emotionSlider = 1.0
             if self.emotionSlider < -1.0: self.emotionSlider = -1.0
             
+            self.scene.PushMessage("SET_GEL_R "+str(int((self.emotionSlider*0.5 + 0.5)*255)))
+            self.scene.PushMessage("SET_GEL_G "+str(int(((-self.spaceSlider)*0.5 + 0.5)*255)))
+            
+            print(int((self.emotionSlider*0.5 + 0.5)*255), int(((-self.spaceSlider)*0.5 + 0.5)*255))
+        
+        if data[0] == "RESET":
+            self.Reset()
