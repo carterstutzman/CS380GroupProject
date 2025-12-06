@@ -184,14 +184,13 @@ class Generator:
                 self.PlayChord()
 
                 self.chordTimer -= 2.0
-                self.chordIndex = (self.chordIndex + 1) % len(self.chordMap)
+                #self.chordIndex = (self.chordIndex + 1) % len(self.chordMap)
                 if (self.startedPlaying == True):
                   self.barIndex = (self.barIndex + 1) % len(self.melodyMap)
 
                 self.MakeMelody()
                 
-                print(random.randint(0,1))
-            
+                
                 #TEMP
                 if (self.startedPlaying == False): self.melodyTimer = 0.25
                 self.startedPlaying = True
