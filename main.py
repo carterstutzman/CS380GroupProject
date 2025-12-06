@@ -131,8 +131,6 @@ class Camera:
 
         
         
-
-
 class Scene:
     def __init__(self, stuff=[]):
         self.stuff = stuff
