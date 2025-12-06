@@ -190,7 +190,7 @@ class Drippy:
         data = msg.split(" ")
         outMsg = ""
         if data[0] == "LOADPIANO":
-            i = 0
+            i = 1
             for a in os.listdir("./samples/piano"):
                 try:
                     self.LoadSample("./samples/piano/"+a, str(i), loop = False)

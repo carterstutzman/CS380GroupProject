@@ -236,8 +236,7 @@ class Generator:
 
                 self.MakeMelody(self.chordMap[self.chordIndex])
                 
-                print(random.randint(0,1))
-            
+                
                 #TEMP
                 if (self.startedPlaying == False): self.melodyTimer = 0.25
                 self.startedPlaying = True
