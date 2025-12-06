@@ -205,12 +205,38 @@ class Generator:
         else:
             self.melodyMap.append(self.EmptyBar())
         
+        for n in range(0, 5):
+            self.AddNoteToBar(self.melodyMap[len(self.melodyMap) - 1])
+
         #self.melodyMap.append([self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote])
         
         # if len(self.melodyMap) % 2 == 0:
         #     self.melodyMap.append(self.MakeMajorScale())
         # else:
         #     self.melodyMap.append(self.MakeMinorScale())
+
+    def AddNoteToBar(self, bar):
+        indices = []
+        for n in range(0, 8):
+            if (bar[n] == None): indices.append(n)
+        
+        if (len(indices) == 0): return
+
+        index = indices[random.randint(0, 7)]
+        num = 0
+        if (index > 0):
+            left = bar[index - 1]
+            if (index != None): 
+                bar[index] += left
+                num += 1
+        if (index < 7):
+            right = bar[index - 1]
+            if (index != None):
+                bar[index] += right
+                num += 1
+        
+        bar[index] //= num
+            
 
     def Update(self, dt):
         if not self.pause:
