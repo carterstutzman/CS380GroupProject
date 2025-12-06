@@ -56,7 +56,9 @@ circleFifths = [["C maj", "G maj","D maj","A maj","E maj","B maj","F# maj","Db m
 class Generator:
     def __init__(self, audioLiaison):
         self.liaison = audioLiaison
-
+        self.Reset()
+        
+    def Reset(self):
         self.pause = False
         self.scene = None
         self.chordMap = circleFifths[0]
@@ -98,6 +100,7 @@ class Generator:
         #SLIDERS
         self.spaceSlider = 0.0
         self.emotionSlider = 0.0
+
 
     def GetKey(self, Note): #Takes key string
         return (notes.index(Note) + 1) + (12 * self.octave)
@@ -330,4 +333,6 @@ class Generator:
             self.scene.PushMessage("SET_GEL_G "+str(int(((-self.spaceSlider)*0.5 + 0.5)*255)))
             
             print(int((self.emotionSlider*0.5 + 0.5)*255), int(((-self.spaceSlider)*0.5 + 0.5)*255))
-            
+        
+        if data[0] == "RESET":
+            self.Reset()

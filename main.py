@@ -129,7 +129,7 @@ class Camera:
         if data[0] == "SET_GEL_A":
             self.gel.opacity = int(self.data[1])
 
-        
+
         
 class Scene:
     def __init__(self, stuff=[]):
