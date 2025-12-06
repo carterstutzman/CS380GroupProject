@@ -550,7 +550,7 @@ class AudioLiaison:
         
         self.ptimer = 0.0
 
-        self.active = True
+        self.active = False
         self.activatePress = True
 
         self.echo = False
@@ -691,11 +691,11 @@ def on_draw():
 
     window.clear()
 
-    FNT[FNT.index(":")+1].blit(360-64, 720-128-8, width=128,height=128)
-    FNT[FNT.index(";")+1].blit(360-64, 128-64-64+8, width=128,height=128)
+    FNT[FNT.index(":")+1].blit(360-32, 720-64-8, width=64,height=64)
+    FNT[FNT.index(";")+1].blit(360-32, 128-0-128+8, width=64,height=64)
     
-    FNT[FNT.index("<")+1].blit(720-128-8,   360-64, width=128,height=128)
-    FNT[FNT.index(">")+1].blit(128-64-64+8, 360-64, width=128,height=128)
+    FNT[FNT.index("<")+1].blit(720-64-8,   360-32, width=64,height=64)
+    FNT[FNT.index(">")+1].blit(128-64-64+8, 360-32, width=64,height=64)
     
     
     scene.Render()
