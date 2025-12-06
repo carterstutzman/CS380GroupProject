@@ -1,6 +1,11 @@
 import random 
 import pyglet
 from pyglet import shapes
+
+
+screenSize = [720,720]
+centerX = int(screenSize[0]/2)
+centerY = int(screenSize[1]/2)
 """
 chord notation brainstorming
 
@@ -91,10 +96,8 @@ class Generator:
         self.scale = self.MakeMajorScale()
 
         #SLIDERS
-        self.jazziness = 0.0  #Chances to do a 7th chord
-        self.suspense  = 0.0  #Chances to do sus chord
-        self.chaos     = 0.0  #Chances to not resolve/revisit past patterns
-        self.sadness   = 0.0  #Chances to do minor sounding things
+        self.spaceSlider = 0.0
+        self.emotionSlider = 0.0
 
     def GetKey(self, Note): #Takes key string
         return (notes.index(Note) + 1) + (12 * self.octave)
@@ -264,7 +267,7 @@ class Generator:
                 
     
     def Render(self, camera=None):
-        pyglet.shapes.Rectangle(360-50,360+50,100,100,color=(255,0,0)).draw()
+        pyglet.shapes.Rectangle(360-50 + self.spaceSlider*360,360-50+self.emotionSlider*360,100,100,color=(255,0,0)).draw()
         
 
 
@@ -280,3 +283,14 @@ class Generator:
         if data[0] == "MAJ7":
             self.chordMap = circleFifths[2]
         
+
+        if data[0] == "DRAG":
+            self.spaceSlider = int(data[1]) / centerX - 1.0
+            self.emotionSlider = int(data[2]) / centerY - 1.0
+            
+            if self.spaceSlider > 1.0: self.spaceSlider = 1.0
+            if self.spaceSlider < -1.0: self.spaceSlider = -1.0
+            
+            if self.emotionSlider > 1.0: self.emotionSlider = 1.0
+            if self.emotionSlider < -1.0: self.emotionSlider = -1.0
+            
