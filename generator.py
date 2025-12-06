@@ -189,16 +189,21 @@ class Generator:
 
         print(bar)
         return bar
+    
+    def EmptyBar(self):
+        return [None, None, None, None, None, None, None, None]
 
     def MakeMelody(self, STR):
         dat = STR.split(" ")
         self.rootNote = (notes.index(dat[0])) + (12 * self.octave)
         print("NOTE:",self.rootNote)
-        nextBar = None
-        if (random.randint(0, 9) >= 5): 
+        ran = random.randint(0, 9)
+        if (ran >= 3): 
             self.melodyMap.append(self.StandardBar())
-        else:
+        elif (ran >= 6):
             self.melodyMap.append(self.Arpeggio())
+        else:
+            self.melodyMap.append(self.EmptyBar())
         
         #self.melodyMap.append([self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote, self.rootNote])
         
