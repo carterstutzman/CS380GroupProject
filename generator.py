@@ -59,7 +59,8 @@ class Generator:
 
         self.pause = False
         
-        self.chordMap = []
+        self.chordMap = ["C maj"]
+        self.chordToAdd = "C maj"
         # for i in range(0, 12):
         #     self.chordMap += [
         #     notes[i] + " maj",
@@ -79,6 +80,7 @@ class Generator:
         self.chordOffsets = []
 
         self.chordTimer = 0.0
+        self.chordRepeats = 0
 
         self.melodyMap = [ #Offsets from root note of scale
             
@@ -87,6 +89,7 @@ class Generator:
         self.melodyTimer = 0.0
         self.melodyIndex = 0
         self.barIndex = 0
+        self.circleIndex = 0
         #TEMP
         self.startedPlaying = False
 
@@ -196,7 +199,10 @@ class Generator:
     def EmptyBar(self):
         return [None, None, None, None, None, None, None, None]
 
-    def MakeMelody(self, STR):
+    def MakeMelody(self, STR, space, emotion):
+        s = (space + 1.0) / 2.0
+        e = (emotion + 1.0) / 2.0
+
         dat = STR.split(" ")
         self.rootNote = (notes.index(dat[0])) + (12 * self.octave)
         print("NOTE:",self.rootNote)
@@ -208,8 +214,11 @@ class Generator:
         else:
             self.melodyMap.append(self.EmptyBar())
         
-        for n in range(0, 5):
-            self.AddNoteToBar(self.melodyMap[len(self.melodyMap) - 1])
+        numToAdd = 0
+        if (space >= 0.0):
+            numToAdd = int(space * 6.0 * (random.randint(0, 100) / 100.0))
+            for n in range(0, numToAdd):
+                self.AddNoteToBar(self.melodyMap[len(self.melodyMap) - 1])
 
         print(self.melodyMap[len(self.melodyMap) - 1])
 
@@ -247,7 +256,27 @@ class Generator:
         else: bar[index] //= num  
 
     def MakeChordSegment(self, val):
-        return
+        print(val)
+        normVal = (val + 1.0) / 2.0
+        numBars = 0
+        if(random.randint(0,100) / 100.0 > normVal):
+            if(random.randint(0,100) / 100.0 > 0.5):
+                numBars = 1
+            else:
+                numBars = 2
+        else:
+            if(random.randint(0,100) / 100.0 > 0.5):
+                numBars = 4
+            else:
+                numBars = 8
+
+        prevChord = self.chordMap[len(self.chordMap) - 1]
+        position = circleFifths[self.circleIndex].index(prevChord)
+        newPosition = (position + random.choice([-1, 1])) % len(circleFifths[self.circleIndex])
+        if (newPosition < 0): newPosition += len(circleFifths[self.circleIndex])
+
+        self.chordRepeats = numBars
+        self.chordToAdd = circleFifths[self.circleIndex][newPosition]
 
     def Update(self, dt):
         if not self.pause:
@@ -258,12 +287,15 @@ class Generator:
             if (self.startedPlaying == True):
                 self.melodyTimer += dt
             while self.chordTimer >= 2.0:
+                #if (self.chordRepeats <= 0): self.chordMap += self.MakeChordSegment(self.spaceSlider)
+                self.chordMap.append(self.chordToAdd)
+                self.chordRepeats -= 1
+                if (self.chordRepeats <= 0): self.MakeChordSegment(-self.spaceSlider)
+
+                print("INDEX:",self.chordIndex)
                 self.liaison.Print(self.chordMap[self.chordIndex].upper())
                 #self.StopChord()
                 self.PlayChord()
-
-                self.chordTimer -= 2.0
-                self.chordIndex = (self.chordIndex + 1) % len(self.chordMap)
 
                 #Make minor
                 # randVal = random.randint(0, 100)
@@ -275,7 +307,10 @@ class Generator:
                 if (self.startedPlaying == True):
                   self.barIndex = (self.barIndex + 1) % len(self.melodyMap)
 
-                self.MakeMelody(self.chordMap[self.chordIndex])
+                self.MakeMelody(self.chordMap[self.chordIndex], self.spaceSlider, self.emotionSlider)
+
+                self.chordTimer -= 2.0
+                self.chordIndex = (self.chordIndex + 1)
                 
                 #TEMP
                 if (self.startedPlaying == False): self.melodyTimer = 0.25
