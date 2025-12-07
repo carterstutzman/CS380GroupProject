@@ -295,8 +295,12 @@ class Generator:
             newPosition = (position + random.randint(-2, 2)) % len(circleFifths[self.circleIndex])
         
         except:
-            position = circleFifths[not self.circleIndex].index(prevChord)
-            newPosition = position
+            for i in range(0, len(circleFifths)):
+                try:
+                    position = circleFifths[i].index(prevChord)
+                    newPosition = position
+                except:
+                    pass
         if (newPosition < 0): newPosition += len(circleFifths[self.circleIndex])
 
         numBars = 1
@@ -310,8 +314,18 @@ class Generator:
             ##emotion stuff
             self.moodTimer += dt
             moodSwing = math.sin(self.moodTimer)+self.emotionSlider
-            self.octave = int(3 + moodSwing)
-            self.circleIndex = moodSwing < 0.0
+            self.octave = int(3 + moodSwing//2)
+            if moodSwing > 0.0:
+                self.circleIndex = 0
+            if moodSwing > 1.0:
+                self.circleIndex = 2
+            
+            if moodSwing < 0.0:
+                self.circleIndex = 1
+            if moodSwing < -1.0:
+                self.circleIndex = 3
+            
+            
             s = (self.spaceSlider + 1.0) / 2.0
             if (self.spaceSlider < 0): self.bpm = -(self.spaceSlider) * (3.5 - 2.0) + 2.0
             else: self.bpm = (self.spaceSlider) * (1.0 - 2.0) + 2.0
