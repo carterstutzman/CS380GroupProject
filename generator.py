@@ -1,3 +1,10 @@
+"""
+generator.py
+Brief : Dynamic procedural music generator, chord progressions and melody
+Carter Stutzman
+Markus Deitrick
+12/5/2025
+"""
 import random 
 import pyglet
 import math

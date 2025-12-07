@@ -1,3 +1,9 @@
+"""
+audio.py
+Brief : realtime wave audio output using sounddevice
+Carter Stutzman
+12/5/2025
+"""
 import sounddevice as sd
 import wave
 import os,math

@@ -1,6 +1,9 @@
 """
 main.py
-
+Brief : Basic Engine, OpenGL, AudioLiaison console input
+Carter Stutzman
+Markus Deitrick
+12/5/2025
 """
 import pyglet
 from pyglet.window import key
