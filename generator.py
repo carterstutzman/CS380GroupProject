@@ -305,9 +305,11 @@ class Generator:
     def Update(self, dt):
 
         if not self.pause:
+            ##emotion stuff
             self.moodTimer += dt
             moodSwing = math.sin(self.moodTimer)+self.emotionSlider
             self.octave = int(3 + moodSwing)
+            self.circleIndex = moodSwing < 0.0
             #print(self.chordTimer)
             if (dt > 0.5):
                 dt = 0.0
