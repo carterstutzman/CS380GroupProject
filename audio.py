@@ -3,7 +3,7 @@ import wave
 import os,math
 
 def KEY(STEP): #Key Number
-   return ((2**(1/12))**(STEP-49))#*440
+   return ((2**(1/12))**(STEP-49)) # *440
 
 
 def load(file):
@@ -87,13 +87,10 @@ class Channel:
         self.playing = False
         self.pos = 0
     def Update(self, frames):
-        #print(frames, self.samples, self.playing)
-        #double temp = GetData((i + pos) * pitch) / 32767.0;
         if self.sample != None and self.playing:
             for x in range(0, frames):
                 S = self.sample.GetData((self.pos + x)*self.pitch)
                 self.data[x] = S * self.volume
-                #print(S)
             self.pos += x
             if self.pos > self.sample.nsamples*1.0/self.pitch and self.sample.loop == False:
                 self.Stop()

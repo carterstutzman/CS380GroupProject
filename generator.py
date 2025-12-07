@@ -341,7 +341,7 @@ class Generator:
                 self.chordRepeats -= 1
                 if (self.chordRepeats <= 0): self.MakeChordSegment(-self.spaceSlider)
 
-                print("INDEX:",self.chordIndex)
+                #print("INDEX:",self.chordIndex)
                 self.liaison.Print(self.chordMap[self.chordIndex].upper())
                 #self.StopChord()
                 self.PlayChord()
@@ -413,7 +413,6 @@ class Generator:
             self.scene.PushMessage("SET_GEL_R "+str(int((self.emotionSlider*0.5 + 0.5)*255)))
             self.scene.PushMessage("SET_GEL_G "+str(int(((-self.spaceSlider)*0.5 + 0.5)*255)))
             
-            print(int((self.emotionSlider*0.5 + 0.5)*255), int(((-self.spaceSlider)*0.5 + 0.5)*255))
-        
+            
         if data[0] == "RESET":
             self.Reset()
