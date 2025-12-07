@@ -97,6 +97,7 @@ class Generator:
         self.startedPlaying = False
 
         self.octave = 3 #3
+        self.bpm = 1.5 # 1.5 for fast, 3.0 for slow
 
         self.key = self.GetKey("C")
         self.scale = self.MakeMajorScale()
@@ -222,7 +223,6 @@ class Generator:
             else:
                 self.melodyMap.append(self.Arpeggio())
         else:
-            print(space)
             if (ran <= 4 * (1.0+space)): 
                 self.melodyMap.append(self.Arpeggio())
             elif (ran <= 8 * (1.0+(space * space * space))):
@@ -234,7 +234,7 @@ class Generator:
         
         numToAdd = 0
         if (space >= 0.0):
-            numToAdd = int(space * 6.0 * (random.randint(12, 100) / 100.0)) + 1
+            numToAdd = int(space * 7.0 * (random.randint(25, 100) / 100.0)) + 1
             for n in range(0, numToAdd):
                 self.AddNoteToBar(self.melodyMap[len(self.melodyMap) - 1])
 
@@ -271,7 +271,7 @@ class Generator:
                 num += 1
         
         if (bar[index] == 0): bar[index] = currentChord[random.randint(0, 2)] + rootIndex
-        elif (num == 1): bar[index] += random.randint(-2, 2)
+        elif (num == 1): bar[index] += random.choice([-2, 2])
         else: bar[index] //= num  
 
     def MakeChordSegment(self, val):
@@ -292,12 +292,14 @@ class Generator:
         prevChord = self.chordMap[len(self.chordMap) - 1]
         try:
             position = circleFifths[self.circleIndex].index(prevChord)
-            newPosition = (position + random.choice([-1, 1])) % len(circleFifths[self.circleIndex])
+            newPosition = (position + random.randint(-2, 2)) % len(circleFifths[self.circleIndex])
         
         except:
             position = circleFifths[not self.circleIndex].index(prevChord)
             newPosition = position
         if (newPosition < 0): newPosition += len(circleFifths[self.circleIndex])
+
+        numBars = 1
 
         self.chordRepeats = numBars
         self.chordToAdd = circleFifths[self.circleIndex][newPosition]
@@ -310,13 +312,16 @@ class Generator:
             moodSwing = math.sin(self.moodTimer)+self.emotionSlider
             self.octave = int(3 + moodSwing)
             self.circleIndex = moodSwing < 0.0
+            s = (self.spaceSlider + 1.0) / 2.0
+            if (self.spaceSlider < 0): self.bpm = -(self.spaceSlider) * (3.5 - 2.0) + 2.0
+            else: self.bpm = (self.spaceSlider) * (1.0 - 2.0) + 2.0
             #print(self.chordTimer)
             if (dt > 0.5):
                 dt = 0.0
             self.chordTimer += dt
             if (self.startedPlaying == True):
                 self.melodyTimer += dt
-            while self.chordTimer >= 2.0:
+            while self.chordTimer >= self.bpm:
                 #if (self.chordRepeats <= 0): self.chordMap += self.MakeChordSegment(self.spaceSlider)
                 self.chordMap.append(self.chordToAdd)
                 self.chordRepeats -= 1
@@ -339,13 +344,13 @@ class Generator:
 
                 self.MakeMelody(self.chordMap[self.chordIndex], self.spaceSlider, self.emotionSlider)
 
-                self.chordTimer -= 2.0
+                self.chordTimer -= self.bpm
                 self.chordIndex = (self.chordIndex + 1)
                 
                 #TEMP
-                if (self.startedPlaying == False): self.melodyTimer = 0.25
+                if (self.startedPlaying == False): self.melodyTimer = (self.bpm / 8)
                 self.startedPlaying = True
-            while self.melodyTimer >= 0.25:
+            while self.melodyTimer >= (self.bpm / 8):
                 #self.liaison.Print(str(self.melodyMap[self.barIndex][self.melodyIndex]))
                 #self.StopChord()
                 #self.PlayChord()
@@ -357,7 +362,7 @@ class Generator:
                 #self.liaison.PushMessage("PLAY "+str(self.melodyMap[self.melodyIndex])+" 1.0 1.0 0.0")
                 #MARKUS
                 
-                self.melodyTimer -= 0.25
+                self.melodyTimer -= (self.bpm / 8)
                 self.melodyIndex = (self.melodyIndex + 1) % len(self.melodyMap[self.barIndex])
                 
                 #print(random.randint(0,1))
